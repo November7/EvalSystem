@@ -5,11 +5,11 @@
 #build: 2016.1003
 
 #################################################################
-#								#
-#  checkUser -u -id -gid -p -s					#
-#  checkUser --user --user-id --group-id --path --shell		#
-#  return 1 if user exist with options, otherwise 0		#
-#								#
+#																#
+#  checkUser -u -id -gid -p -s									#
+#  checkUser --user --user-id --group-id --path --shell			#
+#  return 1 if user exist with options, otherwise 0				#
+#																#
 #################################################################
 
 exec 2> /dev/null
@@ -112,11 +112,10 @@ function checkInt
 zm=$(checkUser -u "root" -s /bin/sh)
 echo $zm
 
-#hosts="inventory/hosts"
+# parsing file given as first argument of this script...
 
-# List hosts we're going to try to connect to
-#grep -vE '^(\s*$|#)' $hosts
-
-while IFS='' read -r line || [[ -n "$line" ]]; do
-    echo "$line"
-done < "$1"
+grep -vE '^(\s*$|#)' $1 | while read -r line ;
+do	
+	eval x=($line)
+	#echo "1: ${x[0]} 2: ${x[1]} 3: ${x[2]}"
+done
