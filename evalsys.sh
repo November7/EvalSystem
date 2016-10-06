@@ -58,7 +58,6 @@ function checkUser
 }
 #######################################
 
-
 function checkFile
 {
 	echo $(cat "$1" | grep "$2" -c)	
@@ -99,12 +98,12 @@ function checkInt
         esac
         shift
     done
+	
+	#..............
+	
 }
 
 #userId Student 1000
-
-
-
 
 #zm=$(parseFile /etc/passwd 1000)
 #echo $zm
