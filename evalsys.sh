@@ -1,18 +1,16 @@
 #!/bin/bash
 
-#author: Marcin Kowalski
-#version: 0.1
-#build: 2016.1003
+# author: Marcin Kowalski
+# version: 1.0
+# build: 1610.18
 
-#################################################################
-#																#
-#  checkUser -u -id -gid -p -s									#
-#  checkUser --user --user-id --group-id --path --shell			#
-#  return 1 if user exist with options, otherwise 0				#
-#																#
-#################################################################
-
-exec 2> /dev/null
+#--------------------------------------------------------------------------------
+#	
+#  checkUser -u -id -gid -p -s									
+#  checkUser --user --user-id --group-id --path --shell		
+#  return 1 if user exist with options, otherwise 0				
+#						
+#--------------------------------------------------------------------------------
 
 function checkUser
 {
@@ -21,100 +19,128 @@ function checkUser
 		i="$1"
 		case $i in
 			-u|--user)
-			user=$2
-			shift
-			;;
-			-id|--user-id)
-			id=$2
-			shift
-			;;
+				user=$2
+				shift
+				;;
+			-id|--user-id)id=$2
+				shift
+				;;
 			-gid|--group-id)
-			gid=$2
-			shift
-			;;
+				gid=$2
+				shift
+				;;
 			-p|--path)
-			path=$2
-			shift
-			;;
+				path=$2
+				shift
+				;;
 			-s|--shell)
-			shell=$2
-			shift
-			;;                    
+				shell=$2
+				shift
+				;;
 			*)
-			(>&2 echo "unknown option")
-			;;
-        esac
-        shift
-    done
-	
+				(>&2 echo "unknown option")
+				;;
+		esac
+		shift
+	done
+
 	line=$(getent passwd "$user")	
- 	
- 	echo $(($(echo "$line" | wc -l) && 
-		$(echo "$line" | cut -d: -f3 | grep "$id" -c) &&
-		$(echo "$line" | cut -d: -f4 | grep "$gid" -c) && 
- 		$(echo "$line" | cut -d: -f6 | grep "$path" -c) && 
- 		$(echo "$line" | cut -d: -f7 | grep "$shell" -c)))
- 	
+	echo $(($(echo "$line" | wc -l) && 
+	$(echo "$line" | cut -d: -f3 | grep "$id" -c) &&
+	$(echo "$line" | cut -d: -f4 | grep "$gid" -c) && 
+	$(echo "$line" | cut -d: -f6 | grep "$path" -c) && 
+	$(echo "$line" | cut -d: -f7 | grep "$shell" -c)))
 }
-#######################################
 
-function checkFile
+#---------------------------------- checkFile ------------------------------------
+
+function parseFile
 {
-	echo $(cat "$1" | grep "$2" -c)	
+	echo $(cat "$1" | grep -vE '^(\s*$|#)' | grep "$2" -c)	
 }
 
-#######################################
-
+#---------------------------------- checkInt -------------------------------------
 
 function checkInt
 {
 	while [[ $# -gt 1 ]]
 	do
-		i="$1"
-		case $i in
+		case $1 in
 			-i|--interface)
-			interface=$2
-			shift
-			;;
+				interface=$2
+				shift
+				;;
 			-a|--address)
-			address=$2
-			shift
-			;;
+				address=$2
+				shift
+				;;
 			-m|--netmask)
-			netmask=$2
-			shift
-			;;
+				netmask=$2
+				shift
+				;;
 			-g|--gateway)
-			gateway=$2
-			shift
-			;;
-			-d|--dns)
-			dns=$2
-			shift
-			;;                    
+				gateway=$2
+				shift
+				;;
 			*)
-			(>&2 echo "unknown option")
-			;;
-        esac
-        shift
-    done
-	
-	#..............
+				(>&2 echo "unknown option")
+				;;
+		esac
+		shift
+	done
+	line=$(ifconfig $interface)	
+	echo $(($(echo $line | wc -l) &&
+	$(echo $line | grep "inet addr:$address" -c) &&
+	$(echo $line | grep "Mask:$netmask" -c) && 
+	$(netstat -r | grep "default" | grep "$gateway" | grep "$address" | grep "$interface" -c)))
 	
 }
 
-#userId Student 1000
+#---------------------------------- Consts ---------------------------------------
 
-#zm=$(parseFile /etc/passwd 1000)
-#echo $zm
+RED='\033[0;31m'
+GRN='\033[0;32m'
+NC='\033[0m' # No Color
 
-zm=$(checkUser -u "root" -s /bin/sh)
-echo $zm
+#---------------------------------------------------------------------------------
 
-# parsing file given as first argument of this script...
+if [ $# -lt 1 ];
+ then exit
+fi
 
-grep -vE '^(\s*$|#)' $1 | while read -r line ;
+# exec 2> /dev/null
+
+#----------------------------------- Vars ----------------------------------------
+
+pts=0
+total=0
+
+#---------------------------------------------------------------------------------
+
+clear
+printf "%s\n" "-------------------------------------------------------"
+printf "%s\n" " Automatyczny system oceniania."
+printf "%s\n" "-------------------------------------------------------"
+
+while read -r line 
 do	
-	eval x=($line)
-	#echo "1: ${x[0]} 2: ${x[1]} 3: ${x[2]}"
-done
+	eval part=($line)	
+#	echo "${part[0]} ${part[1]}"
+	printf "%-50s" "${part[0]}:"
+	point=`eval "${part[1]}"`
+	
+	if [ $point -eq 1 ]; then 
+		printf "${GRN}[OK]\n${NC}"
+		pts=$(($pts+${part[2]}))
+	else 
+		printf "${RED}[FAIL]\n${NC}"        
+	fi        
+	total=$(($total+${part[2]}))
+	
+done < <(grep -vE '^(\s*$|#)' $1)
+
+printf "%s\n" "-------------------------------------------------------"
+grade=`bc <<< "scale=2; 100*$pts/$total"`
+printf "Uzyskałeś: %d na %d punktów czyli %s%%\n" $pts $total $grade
+
+#------------------------------------ END ----------------------------------------
