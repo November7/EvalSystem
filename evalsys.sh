@@ -103,6 +103,12 @@ function checkDHCPleases
     awk " /lease $1/ {flag=1; next} /}/{flag=0} flag {print}" /var/lib/dhcp/dhcpd.leases | grep "hardware ethernet $2" -c
 }
 
+#------------------------------- isInstalled -------------------------------------
+
+function isInstalled
+{
+    apt-cache policy $1 | grep Zainstalowana | grep -vE 'brak' -c
+}
 
 #---------------------------------- Consts ---------------------------------------
 
