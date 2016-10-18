@@ -96,6 +96,14 @@ function checkInt
 	
 }
 
+#----------------------------- check DHCP leases ---------------------------------
+
+function checkDHCPleases
+{
+    awk " /lease $1/ {flag=1; next} /}/{flag=0} flag {print}" /var/lib/dhcp/dhcpd.leases | grep "hardware ethernet $2" -c
+}
+
+
 #---------------------------------- Consts ---------------------------------------
 
 RED='\033[0;31m'
