@@ -52,11 +52,28 @@ function checkUser
 	$(echo "$line" | cut -d: -f7 | grep "$shell" -c)))
 }
 
-#---------------------------------- checkFile ------------------------------------
-
+#---------------------------------- parseFile ------------------------------------
+# usage: parseFile <file> <param> <value> <subvalue>
+ 
 function parseFile
 {
-	echo $(cat "$1" | grep -vE '^(\s*$|#)' | grep "$2" -c)	
+	if [ $(cat "$1" | grep -vE '^(\s*$|#)' | grep "$2" | grep "$3" | grep "$4" -c) -gt 0 ]; then 
+		echo 1
+	else 
+		echo 0
+	fi
+}
+
+#------------------------------- checkDHCPHost -----------------------------------
+#usage checkDHCPHost <name> <hardware ethernet> <param> <value>
+ 
+function checkDHCPHost
+{
+	if [ $(cat /etc/dhcp/dhcpd.conf | grep -vE '^(\s*$|#)' | awk " /host\s*$1/ {flag=1; next} /}/{flag=0} flag {print}" | grep -C 10 -E "hardware ethernet\s*$2" | grep "$3\s*$4" -c) -gt 0 ]; then 
+		echo 1
+	else 
+		echo 0
+	fi
 }
 
 #---------------------------------- checkInt -------------------------------------
@@ -96,18 +113,18 @@ function checkInt
 	
 }
 
-#----------------------------- check DHCP leases ---------------------------------
+#---------------------------------- check DHCP leases ----------------------------
 
 function checkDHCPleases
 {
-    awk " /lease $1/ {flag=1; next} /}/{flag=0} flag {print}" /var/lib/dhcp/dhcpd.leases | grep "hardware ethernet $2" -c
+	awk " /lease $1/ {flag=1; next} /}/{flag=0} flag {print}" /var/lib/dhcp/dhcpd.leases | grep "hardware ethernet $2" -c
 }
 
 #------------------------------- isInstalled -------------------------------------
 
 function isInstalled
 {
-    apt-cache policy $1 | grep Zainstalowana | grep -vE 'brak' -c
+	apt-cache policy $1 | grep Zainstalowana | grep -vE 'brak' -c
 }
 
 #---------------------------------- Consts ---------------------------------------
@@ -131,25 +148,30 @@ total=0
 
 #---------------------------------------------------------------------------------
 
-clear
+
+#clear
 printf "%s\n" "-------------------------------------------------------"
-printf "%s\n" " Automatyczny system oceniania."
+printf "%s\n" "Automatyczny system oceniania."
 printf "%s\n" "-------------------------------------------------------"
 
 while read -r line 
 do	
 	eval part=($line)	
-#	echo "${part[0]} ${part[1]}"
-	printf "%-50s" "${part[0]}:"
-	point=`eval "${part[1]}"`
+	if [ ${#part[@]} -eq 3 ]; then
+		printf "%-50s" "${part[0]}:"
+		point=`eval "${part[1]}"`
 	
-	if [ $point -eq 1 ]; then 
-		printf "${GRN}[OK]\n${NC}"
-		pts=$(($pts+${part[2]}))
-	else 
-		printf "${RED}[FAIL]\n${NC}"        
+		if [ $point -eq 1 ]; then 
+			printf "${GRN}[OK]\n${NC}"
+			pts=$(($pts+${part[2]}))
+		else 
+			printf "${RED}[FAIL]\n${NC}" 
+		fi
+		total=$(($total+${part[2]}))
+	else
+		printf "%-50s\n" "${part[0]}"
 	fi        
-	total=$(($total+${part[2]}))
+	
 	
 done < <(grep -vE '^(\s*$|#)' $1)
 
