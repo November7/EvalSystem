@@ -108,8 +108,8 @@ function checkInt
 	line=$(ifconfig $interface)	
 	echo $(($(echo $line | wc -l) &&
 	$(echo $line | grep "inet addr:$address" -c) &&
-	$(echo $line | grep "Mask:$netmask" -c) && 
-	$(netstat -r | grep "default" | grep "$gateway" | grep "$address" | grep "$interface" -c)))
+	$(echo $line | grep "Mask:$netmask" -c) &&
+	$(route -n | grep "0.0.0.0" | grep "$gateway" | grep "$interface" -c)))
 	
 }
 
@@ -139,7 +139,7 @@ if [ $# -lt 1 ];
  then exit
 fi
 
-# exec 2> /dev/null
+#exec 2> /dev/null
 
 #----------------------------------- Vars ----------------------------------------
 
@@ -149,7 +149,7 @@ total=0
 #---------------------------------------------------------------------------------
 
 
-#clear
+clear
 printf "%s\n" "-------------------------------------------------------"
 printf "%s\n" "Automatyczny system oceniania."
 printf "%s\n" "-------------------------------------------------------"
