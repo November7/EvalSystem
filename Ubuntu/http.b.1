@@ -1,0 +1,39 @@
+"Zaliczenie: FTP i HTTP - grupa A"
+""
+"1. Konfiguracja interfejsow sieciowych"
+" - Interfejs eth0 10.38.10.$2" "checkInt -i eth0 -a \"10.38.10.$2\" -m \"255.0.0.0\"" 2
+" - Brama domyslna" "checkInt -i eth0 -g \"10.0.0.1\"" 2
+" - Interfejs eth0:1 10:30.20.$2" "checkInt -i eth0:1 -a \"10.38.20.$2\" -m \"255.0.0.0\"" 2
+" - Adres serwera DNS" "cat /etc/resolv.conf | grep \"nameserver 10.0.0.1\" -c" 1
+""
+"2. Instalacja oprogramowania"
+" - Server HTTP" "isInstalled apache2" 2
+" - Server FTP" "isInstalled vsftpd" 2
+""
+"3. Konfiguracja serwera FTP"
+" - Dzialanie serwera FTP" "pgrep ftp | wc -l" 6
+" - Odblokowanie logowania anonimowego" "parseFileI /etc/vsftpd.conf anonymous_enable=YES" 2
+" - Odblokowanie logowania anonimowego" "parseFileI /etc/vsftpd.conf local_enable=NO" 2
+" - Ograniczenoa konta anonimowego [up]" "parseFileI /etc/vsftpd.conf anon_upload_enable=NO" 2
+" - Ograniczenoa konta anonimowego [lokalizacja]" "parseFileI /etc/vsftpd.conf anon_root=/ftp/anon" 2
+" - Lokalizacja konta anonimowego" "ls /ftp | grep anon -c" 2
+""
+"4. Konfiguracja serwera HTTP"
+" - Dzialanie serwera HTTP" "pgrep apache -c | grep -v 0 -c" 6
+" - Konfiguracja serwera HTTP [lokalizacja srv]" "parseFile /etc/apache2/apache2.conf Directory /srv/" 6
+" - Konfiguracja serwera HTTP [users]" "ls /etc/apache2/mods-enabled | grep userdir.conf -c" 3
+" - Konfiguracja serwera HTTP [users PHP]" "parseFileNE /etc/apache2/mods-enabled/php5.conf \"php_admin_flag \s*engine \s*Off\"" 6
+" - Konfiguracja serwera HTTP [nauczyciel]" "ls /home/nauczyciel/public_html | grep index.php -c" 3
+""
+" - Wirtualny serwer komis" "ls /etc/apache2/sites-enabled | grep -E '^komis\.conf$' -c"
+" - Parametry komis [IP]" "parseFile /etc/apache2/sites-enabled/komis.conf VirtualHost \"10.38.10.$2:80\"" 3
+" - Parametry komis [lokalizacja]" "parseFile /etc/apache2/sites-enabled/komis.conf DocumentRoot /var/www/komis" 3
+" - Parametry komis [pliki index]" "parseFileE /etc/apache2/sites-enabled/komis.conf \"DirectoryIndex \s*index.html \s*index.php\s*$\"" 3
+" - Pliki strony komis" "ls /var/www/komis | grep -E '^index\.php$' -c" 3
+""
+" - Wirtualny serwer hotel" "ls /etc/apache2/sites-enabled | grep -E '^hotel\.conf$' -c"
+" - Parametry hotel [IP]" "parseFile /etc/apache2/sites-enabled/hotel.conf VirtualHost \"10.38.20.$2:80\"" 3
+" - Parametry hotel [lokalizacja]" "parseFile /etc/apache2/sites-enabled/hotel.conf DocumentRoot /srv/hotel" 3
+" - Parametry hotel [pliki index]" "parseFileE /etc/apache2/sites-enabled/hotel.conf \"DirectoryIndex \s*index.php\s*$\"" 3
+" - Pliki strony hotel" "ls /srv/hotel | grep -E '^index\.php$' -c" 6
+

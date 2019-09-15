@@ -1,0 +1,56 @@
+"Zaliczenie: DNS i IPTABLES"
+""
+"1. Konfiguracja interfejsow sieciowych"
+" - Interfejs eth0 10.38.100.$2" "checkInt -i eth0 -a \"10.38.100.$2\" -m \"255.0.0.0\"" 2
+" - Brama domyslna" "checkInt -i eth0 -g \"10.0.0.1\"" 2
+" - Interfejs eth1 172.16.0.1" "checkInt -i eth1 -a \"172.16.0.1\" -m \"255.255.255.192\"" 2
+" - Adres serwera DNS" "cat /etc/resolv.conf | grep \"nameserver 127.0.0.1\" -c" 1
+""
+"2. Instalacja oprogramowania"
+" - Server DNS" "isInstalled bind9" 2
+""
+"3. Konfiguracja serwera DNS"
+" - Dzialanie serwera DNS" "service bind9 restart 1>/dev/NULL; pgrep named | wc -l" 6
+" - Stworzona ACL" "named-checkconf -p | grep "acl.*\"moje_sieci\".*{" -c" 1
+" - ACL localhost" "named-checkconf -p | grep -A4 "acl.*\"moje_sieci\".*{" | grep localhost -c" 1
+" - ACL 172.16.0.0/26" "named-checkconf -p | grep -A4 "acl.*\"moje_sieci\".*{" | grep 172.16.0.0/26 -c" 1
+" - Konfiguracja dozwolonych klientow" "named-checkconf -p | grep -A3 'allow-query' | grep moje_sieci -c" 1
+" - Konfiguracja forwardowania" "named-checkconf -p | grep 'forward.*only' -c" 1
+" - Konfiguracja forwarderow" "named-checkconf -p | grep -A3 'forwarders' | grep 10.0.0.1 -c" 1
+" - Strefa dns.local" "named-checkconf -p | grep zone | grep dns.local -c" 1
+" - Strefa portal.local" "named-checkconf -p | grep zone | grep portal.local -c" 1
+" - Strefa wyszukiwania wstecz" "named-checkconf -p | grep zone | grep 0.16.172 -c" 1
+""
+" - Strefa dns.local:"
+" - SOA TTL" "named-checkzone -q -o - dns.local /etc/bind/db.dns.local | grep 'dns.local..*43200.*SOA' -c" 1
+" - SOA Dane" "named-checkzone -q -o - dns.local /etc/bind/db.dns.local | grep 'SOA.*ns1.dns.local..*admin.dns.local.' -c" 2
+" - SOA Parametry" "named-checkzone -q -o - dns.local /etc/bind/db.dns.local | grep 'SOA.*7200.*3600.*7200.*7200' -c" 2
+" - Rekord NS" "named-checkzone -q -o - dns.local /etc/bind/db.dns.local | grep 'dns.local..*43200.*NS.*ns1.dns.local.' -c" 2
+" - Rekord A: dns.local" "named-checkzone -q -o - dns.local /etc/bind/db.dns.local | grep '^dns.local..*43200.*A.*172.16.0.1' -c" 2
+" - Rekord A: ns1.dns.local" "named-checkzone -q -o - dns.local /etc/bind/db.dns.local | grep '^ns1.dns.local..*43200.*A.*172.16.0.1' -c" 2
+""
+" - Strefa portal.local:" " - SOA TTL" "named-checkzone -q -o - portal.local /etc/bind/db.portal.local | grep 'portal.local..*86400.*SOA' -c" 1
+" - SOA Dane" "named-checkzone -q -o - portal.local /etc/bind/db.portal.local | grep 'SOA.*ns1.dns.local..*admin.dns.local.' -c" 2
+" - SOA Parametry" "named-checkzone -q -o - portal.local /etc/bind/db.portal.local | grep 'SOA.*14400.*7200.*14400.*14400' -c" 2
+" - Rekord NS" "named-checkzone -q -o - portal.local /etc/bind/db.portal.local | grep 'portal.local..*86400.*NS.*ns1.dns.local.' -c" 2
+" - Rekord CNAME" "named-checkzone -q -o - portal.local /etc/bind/db.portal.local | grep 'www.portal.local..*43200.*CNAME.*portal.local.' -c" 2
+" - Rekord A: portal.local" "named-checkzone -q -o - portal.local /etc/bind/db.portal.local | grep '^portal.local..*43200.*A.*172.16.0.2' -c" 2
+" - Rekord A: ftp.portal.local" "named-checkzone -q -o - portal.local /etc/bind/db.portal.local | grep '^ftp.portal.local..*43200.*A.*172.16.0.3' -c" 2
+" - Rekord A: pc.portal.local" "named-checkzone -q -o - portal.local /etc/bind/db.portal.local | grep '^pc.portal.local..*604800.*A.*172.16.0.10' -c" 2
+""
+" - Strefa wyszukiwania wstecz:"
+" - Rekord PTR: .1" "named-checkzone -q -o - 0.16.172.in-addr.arpa /etc/bind/db.reverse.local | grep '^1.0.16.172.*43200.*PTR.*\sdns.local' -c" 1
+" - Rekord PTR: .1" "named-checkzone -q -o - 0.16.172.in-addr.arpa /etc/bind/db.reverse.local | grep '^1.0.16.172.*43200.*PTR.*ns1.dns.local' -c" 1
+" - Rekord PTR: .2" "named-checkzone -q -o - 0.16.172.in-addr.arpa /etc/bind/db.reverse.local | grep '^2.0.16.172.*43200.*PTR.*\sportal.local' -c" 2
+" - Rekord PTR: .3" "named-checkzone -q -o - 0.16.172.in-addr.arpa /etc/bind/db.reverse.local | grep '^3.0.16.172.*43200.*PTR.*ftp.portal.local' -c" 2
+" - Rekord PTR: .10" "named-checkzone -q -o - 0.16.172.in-addr.arpa /etc/bind/db.reverse.local | grep '^10.0.16.172.*604800.*PTR.*pc.portal.local' -c" 2
+""
+"4. Konfiguracja IPTABLES" " - Skrypt firewall.sh" "ls -l /root | grep 'firewall.sh' -c" 1
+" - Prawa pliku firewall.sh" "stat -c \"%A\" /root/firewall.sh | grep 'x' -c" 1
+" - Domyslna polityka INPUT" "iptables -S | grep '\-P INPUT' | grep 'ACCEPT' -c" 1
+" - Domyslna polityka OUTPUT" "iptables -S | grep '\-P OUTPUT' | grep 'ACCEPT' -c" 1
+" - Domyslna polityka FORWARD" "iptables -S | grep '\-P FORWARD' | grep 'DROP' -c" 1
+" - NAT (Maskarada)" "iptables -t nat -S | grep 'POSTROUTING' | grep '\-o.*eth0' | grep '\-j.*MASQUERADE' -c" 3
+" - Blokada HTTP" "iptables -S | grep 'INPUT' | grep '\-i.*eth0' | grep '\-p.*tcp' | grep '\-dport.*80' | grep '\-j.*DROP' -c" 3
+" - Logi TELNET" "iptables -S | grep 'INPUT' | grep '\-i.*eth1' | grep '\-p.*tcp' | grep '\-dport.*23' | grep '\-j.*LOG' -c" 3
+" - Logi TELNET (NEW)" "iptables -S | grep 'INPUT' | grep '\-i.*eth1' | grep '\-p.*tcp' | grep '\-dport.*23' | grep '\-state.*NEW' | grep '\-j.*LOG' -c" 5

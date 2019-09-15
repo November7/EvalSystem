@@ -1,0 +1,44 @@
+"Zaliczenie: FTP i HTTP - grupa A"
+""
+"1. Konfiguracja interfejsow sieciowych"
+" - Interfejs eth0 10.38.10.$2" "checkInt -i eth0 -a \"10.38.10.$2\" -m \"255.0.0.0\"" 2
+" - Brama domyslna" "checkInt -i eth0 -g \"10.0.0.1\"" 2
+" - Interfejs eth0:1 10:30.20.$2" "checkInt -i eth0:1 -a \"10.38.20.$2\" -m \"255.0.0.0\"" 2
+" - Adres serwera DNS" "cat /etc/resolv.conf | grep \"nameserver 10.0.0.1\" -c" 1
+""
+"2. Instalacja oprogramowania"
+" - Server HTTP" "isInstalled apache2" 2
+" - Server FTP" "isInstalled vsftpd" 2
+""
+"3. Konfiguracja serwera FTP"
+" - Dzialanie serwera FTP" "pgrep ftp | wc -l" 6
+" - Odblokowanie logowanie lokalne" "parseFileI /etc/vsftpd.conf local_enable=YES" 2
+" - Odblokowanie zapisu" "parseFileI /etc/vsftpd.conf write_enable=YES" 2
+" - Konfiguracja praw" "parseFileI /etc/vsftpd.conf umask 011" 2
+" - Komunkiat powitalny" "parseFileI /etc/vsftpd.conf ftpd_banner \"Witaj na serwerze FTP\"" 2
+" - Zablokowanie logowania anonimowego" "parseFileI /etc/vsftpd.conf anonymous_enable=NO" 2
+""
+"4. Konfiguracja serwera HTTP"
+" - Dzialanie serwera HTTP" "pgrep apache -c | grep -v 0 -c" 6
+" - Konfiguracja serwera HTTP [:88]" "parseFile /etc/apache2/ports.conf Listen 88" 5
+" - Konfiguracja serwera HTTP [:80]" "parseFile /etc/apache2/ports.conf Listen 80" 1
+" - Konfiguracja serwera HTTP [users]" "ls /etc/apache2/mods-enabled | grep userdir.conf -c" 3
+" - Konfiguracja serwera HTTP [nauczyciel]" "ls /home/nauczyciel/public_html | grep index.html -c" 3
+""
+" - Wirtualny serwer sklep" "ls /etc/apache2/sites-enabled | grep -E '^sklep\.conf$' -c"
+" - Parametry sklep [IP]" "parseFile /etc/apache2/sites-enabled/sklep.conf VirtualHost \"10.38.10.$2:80\"" 3
+" - Parametry sklep [lokalizacja]" "parseFile /etc/apache2/sites-enabled/sklep.conf DocumentRoot /var/www/sklep" 3
+" - Parametry sklep [pliki index]" "parseFileE /etc/apache2/sites-enabled/sklep.conf \"DirectoryIndex \s*index.html \s*index.php\s*$\"" 3
+" - Pliki strony sklep" "ls /var/www/sklep | grep -E '^index\.php$' -c" 2
+""
+" - Wirtualny serwer szkola" "ls /etc/apache2/sites-enabled | grep -E '^szkola\.conf$' -c"
+" - Parametry szkola [IP]" "parseFile /etc/apache2/sites-enabled/szkola.conf VirtualHost \"10.38.10.$2:80\"" 3
+" - Parametry szkola [lokalizacja]" "parseFile /etc/apache2/sites-enabled/szkola.conf DocumentRoot /var/www/szkola" 3
+" - Parametry szkola [pliki index]" "parseFileE /etc/apache2/sites-enabled/szkola.conf \"DirectoryIndex \s*index.php\s*$\"" 3
+" - Pliki strony szkola" "ls /var/www/szkola | grep -E '^index\.php$' -c" 2
+""
+" - Wirtualny serwer test" "ls /etc/apache2/sites-enabled | grep -E '^test\.conf$' -c"
+" - Parametry test [IP]" "parseFile /etc/apache2/sites-enabled/test.conf VirtualHost \"10.38.10.$2:88\"" 3
+" - Parametry test [lokalizacja]" "parseFile /etc/apache2/sites-enabled/test.conf DocumentRoot /var/www/test" 3
+" - Parametry test [pliki index]" "parseFileE /etc/apache2/sites-enabled/test.conf \"DirectoryIndex \s*index.php \s*index.php\s*$\"" 3
+" - Pliki strony test" "ls /var/www/test | grep -E '^index\.php$' -c" 2

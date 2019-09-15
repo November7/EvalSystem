@@ -1,0 +1,87 @@
+#!/bin/bash
+
+if [ $# -ne 1 ];
+ then exit
+fi
+
+###############################
+# const
+
+RED='\033[0;31m'
+GRN='\033[0;32m'
+NC='\033[0m' # No Color
+###############################
+# dane
+
+ip1="10.38.$1.1"
+ip2="10.38.$1.2"
+nm1="255.0.0.0"
+ip3="192.168.38.1"
+nm2="255.255.255.248"
+gate="10.0.0.1"
+dns="8.8.4.4"
+
+
+suma=0
+max=0
+tab1=(
+"2.a Odblokowane konto root" "getent shadow root | cut -d':' -f 2 | grep '!' -v -c"
+"2.b Utworzenie grupy grupa1" "getent group grupa1 | wc -l"
+"  - Sprawdzanie identyfikatora grupy" "getent group grupa1 | cut -d':' -f 3 | grep 20001 -c"
+"  - Utworzenie grupy grupa2" "getent group grupa2 | wc -l"
+"  - Sprawdzanie identyfikatora grupy" "getent group grupa2 | cut -d':' -f 3 | grep 20002 -c"
+"2.c Utworzenie konta adam" "getent passwd adam | wc -l"
+"  - Sprawdzanie grupy grupa1" "getent group grupa1 | grep adam -c"
+"  - Sprawdzanie grupy grupa2" "getent group grupa2 | grep adam -c"
+"  - Katalog domowy" "getent passwd adam | cut -d':' -f6 | grep '/home/userz_zsme/Adam' -c"
+"  - Identyfikator" "getent passwd adam | cut -d':' -f3 | grep '10000' -c"
+"  - Powloka systemowa" "getent passwd adam | cut -d':' -f7 | grep '/bin/bash' -c"
+"  - Utworzony katalog domowy" "ls /home/userz_zsme 2> /dev/null | grep Adam -c"
+"  - Prawa do katalogu domowego" "stat -c '%A' /home/userz_zsme/Adam 2> /dev/null | grep 'drwxrwx---' -c"
+"  - Wlasciciel katalogu domowego" "stat -c '%U%G' /home/userz_zsme/Adam 2> /dev/null | grep 'adamadam' -c"
+"2.d Utworzenie konta jan" "getent passwd jan | wc -l"
+"  - Sprawdzanie grupy grupa1" "getent group grupa1 | grep jan -c"
+"  - Katalog domowy" "getent passwd jan | cut -d':' -f6 | grep '/home/users_2017/Jan' -c"
+"  - Identyfikator" "getent passwd jan | cut -d':' -f3 | grep '20000' -c"
+"  - Powloka systemowa" "getent passwd jan | cut -d':' -f7 | grep '/bin/sh' -c"
+"  - Utworzony katalog domowy" "ls /home/userz_zsme 2> /dev/null | grep Jan -c"
+"  - Prawa do katalogu domowego" "stat -c '%A' /home/userz_zsme/Jan 2> /dev/null | grep 'drwxrwx---' -c"
+"  - Wlasciciel katalogu domowego" "stat -c '%U%G' /home/userz_zsme/Jan 2> /dev/null | grep 'janjan' -c"
+"2.e Katalog userz_zsme" "ls /home 2> /dev/null | grep userz_zsme -c"
+"  - Prawa do katalogu userz_zsme" "stat -c '%A' /home/userz_zsme 2> /dev/null | grep 'drwxr-xr-x' -c"
+"  - Wlasciciel katalogu userz_zsme" "stat -c '%U%G' /home/userz_zsme 2> /dev/null | grep 'rootroot' -c"
+"2.f Dodatkowe katalogi [Adam/dokumenty]" "ls /home/userz_zsme/Adam 2> /dev/null | grep dokumenty -c"
+"  - Prawa do katalogu" "stat -c '%U%G%A' /home/userz_zsme/Adam/dokumenty 2> /dev/null | grep 'adamadamdrwxrwx---' -c"
+"  - Dodatkowe katalogi [Adam/public_html]" "ls /home/userz_zsme/Adam 2> /dev/null | grep dokumenty -c"
+"  - Prawa do katalogu" "stat -c '%U%G%A' /home/userz_zsme/Adam/public_html 2> /dev/null | grep 'adamapachedrwxrwx---' -c"
+"  - Dodatkowe katalogi [Jan/dokumenty]" "ls /home/userz_zsme/Jan 2> /dev/null | grep dokumenty -c"
+"  - Prawa do katalogu" "stat -c '%U%G%A' /home/userz_zsme/Jan/dokumenty 2> /dev/null | grep 'janjandrwxrwx---' -c"
+"  - Dodatkowe katalogi [Jan/public_html]" "ls /home/userz_zsme/Jan 2> /dev/null | grep dokumenty -c"
+"  - Prawa do katalogu" "stat -c '%U%G%A' /home/userz_zsme/Jan/public_html 2> /dev/null | grep 'janapachedrwxrwx---' -c"
+"2.g Plik index.php" "ls /home/userz_zsme/Adam/public_html 2> /dev/null | grep index.php -c"
+"  - Plik index.php" "ls /home/userz_zsme/Jan/public_html 2> /dev/null | grep index.php -c"
+"2.h Konto Romek" "getent passwd romek | grep romek -c | awk '{SUM = 1 - \$1} END {print SUM}'"
+"  - Katalog domowy konta Romek" "ls /stare | grep 'romek' -c | awk '{SUM = 1 - \$1} END {print SUM}'"
+)
+
+
+for ((i = 0; i < ${#tab1[@]}; i++))
+do
+        printf "%-60s" "${tab1[$i]}:"
+        i=$(($i+1))
+
+#       echo `eval "${tab1[$i]}"`
+        pkt=`eval "${tab1[$i]}"`
+        suma=$(($suma+$pkt))
+
+        if [ $pkt -eq 1 ]; then printf "${GRN}[OK]\n${NC}"
+        else printf "${RED}[FAIL]\n${NC}"
+        fi
+        max=$(($max+1))
+done
+
+
+
+printf "%s\n" "----------------------------------------------------"
+wynik=`bc <<< "scale=2; 100*$suma/$max"`
+printf "Uzyskano: %d na %d punktow czyli %s%%\n" $suma $max $wynik
