@@ -13,7 +13,7 @@ NC='\033[0m' # No Color
 suma=0
 max=0
 tab1=(
-"2.a Odblokowane konto root" "getent shadow root | cut -d':' -f 2 | grep '!' -v -c"
+"2.a Odblokowane konto root" "getent shadow root | cut -d':' -f 2 | grep '^[*!]' -v -c"
 "2.b Utworzenie grupy grupa1" "getent group grupa1 | wc -l"
 "  - Sprawdzanie identyfikatora grupy" "getent group grupa1 | cut -d':' -f 3 | grep 20001 -c"
 "  - Utworzenie grupy grupa2" "getent group grupa2 | wc -l"
