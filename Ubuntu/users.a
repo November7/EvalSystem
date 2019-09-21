@@ -16,7 +16,7 @@
 "  - Wlasciciel katalogu domowego" "stat -c '%U%G' /home/users_zsme/adam 2> /dev/null | grep 'adamadam' -c" 3
 "2.d Utworzenie konta jan" "getent passwd jan | wc -l" 3
 "  - Sprawdzanie grupy grupa1" "getent group grupa1 | grep jan -c" 3
-"  - Katalog domowy" "getent passwd jan | cut -d':' -f6 | grep '/home/users_2017/jan' -c" 3
+"  - Katalog domowy" "getent passwd jan | cut -d':' -f6 | grep '/home/users_zsme/jan' -c" 3
 "  - Identyfikator" "getent passwd jan | cut -d':' -f3 | grep '20000' -c" 3
 "  - Powloka systemowa" "getent passwd jan | cut -d':' -f7 | grep '/bin/sh' -c" 3
 "  - Utworzony katalog domowy" "ls /home/users_zsme 2> /dev/null | grep jan -c" 3

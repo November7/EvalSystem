@@ -5,11 +5,11 @@
 # build: 1610.18
 
 #--------------------------------------------------------------------------------
-#	
-#  checkUser -u -id -gid -p -s									
-#  checkUser --user --user-id --group-id --path --shell		
-#  return 1 if user exist with options, otherwise 0				
-#						
+#
+#  checkUser -u -id -gid -p -s
+#  checkUser --user --user-id --group-id --path --shell
+#  return 1 if user exist with options, otherwise 0
+#
 #--------------------------------------------------------------------------------
 
 function checkUser
@@ -44,34 +44,34 @@ function checkUser
 		shift
 	done
 
-	line=$(getent passwd "$user")	
-	echo $(($(echo "$line" | wc -l) && 
+	line=$(getent passwd "$user")
+	echo $(($(echo "$line" | wc -l) &&
 	$(echo "$line" | cut -d: -f3 | grep "$id" -c) &&
-	$(echo "$line" | cut -d: -f4 | grep "$gid" -c) && 
-	$(echo "$line" | cut -d: -f6 | grep "$path" -c) && 
+	$(echo "$line" | cut -d: -f4 | grep "$gid" -c) &&
+	$(echo "$line" | cut -d: -f6 | grep "$path" -c) &&
 	$(echo "$line" | cut -d: -f7 | grep "$shell" -c)))
 }
 
 #---------------------------------- parseFile ------------------------------------
 # usage: parseFile <file> <param> <value> <subvalue>
- 
+
 function parseFile
 {
-	if [ $(cat "$1" | grep -vE '^(\s*$|#)' | grep "$2" | grep "$3" | grep "$4" -c) -gt 0 ]; then 
+	if [ $(cat "$1" | grep -vE '^(\s*$|#)' | grep "$2" | grep "$3" | grep "$4" -c) -gt 0 ]; then
 		echo 1
-	else 
+	else
 		echo 0
 	fi
 }
 
 #------------------------------- checkDHCPHost -----------------------------------
 #usage checkDHCPHost <name> <hardware ethernet> <param> <value>
- 
+
 function checkDHCPHost
 {
-	if [ $(cat /etc/dhcp/dhcpd.conf | grep -vE '^(\s*$|#)' | awk " /host\s*$1/ {flag=1; next} /}/{flag=0} flag {print}" | grep -C 10 -E "hardware ethernet\s*$2" | grep "$3\s*$4" -c) -gt 0 ]; then 
+	if [ $(cat /etc/dhcp/dhcpd.conf | grep -vE '^(\s*$|#)' | awk " /host\s*$1/ {flag=1; next} /}/{flag=0} flag {print}" | grep -C 10 -E "hardware ethernet\s*$2" | grep "$3\s*$4" -c) -gt 0 ]; then
 		echo 1
-	else 
+	else
 		echo 0
 	fi
 }
@@ -105,12 +105,12 @@ function checkInt
 		esac
 		shift
 	done
-	line=$(ifconfig $interface)	
+	line=$(ifconfig $interface)
 	echo $(($(echo $line | wc -l) &&
 	$(echo $line | grep "inet addr:$address" -c) &&
 	$(echo $line | grep "Mask:$netmask" -c) &&
 	$(route -n | grep "0.0.0.0" | grep "$gateway" | grep "$interface" -c)))
-	
+
 }
 
 #---------------------------------- check DHCP leases ----------------------------
@@ -146,6 +146,7 @@ fi
 pts=0
 total=0
 
+
 #---------------------------------------------------------------------------------
 
 
@@ -154,29 +155,30 @@ printf "%s\n" "-------------------------------------------------------"
 printf "%s\n" "Automatyczny system oceniania."
 printf "%s\n" "-------------------------------------------------------"
 
-while read -r line 
-do	
-	eval part=($line)	
+while read -r line
+do
+	eval part=($line)
 	if [ ${#part[@]} -eq 3 ]; then
 		printf "%-50s" "${part[0]}:"
 		point=`eval "${part[1]}"`
-	
-		if [ $point -eq 1 ]; then 
+
+		if [ $point -eq 1 ]; then
 			printf "${GRN}[OK]\n${NC}"
 			pts=$(($pts+${part[2]}))
-		else 
-			printf "${RED}[FAIL]\n${NC}" 
+		else
+			printf "${RED}[FAIL]\n${NC}"
 		fi
 		total=$(($total+${part[2]}))
 	else
 		printf "%-50s\n" "${part[0]}"
-	fi        
-	
-	
-done < <(grep -vE '^(\s*$|#)' $1)
+	fi
+
+shdir="$(dirname "$(realpath "$0")")"
+done < <(grep -vE '^(\s*$|#)' $shdir"/"$1)
 
 printf "%s\n" "-------------------------------------------------------"
-#grade=`bc <<< "scale=2; 100*$pts/$total"`
-printf "Uzyskałeś: %d na %d punktów\n" $pts $total
+prcnt=$((10000*$pts/$total))
+
+printf "Uzyskałeś: %d na %d punktów [%s%%]\n" $pts $total ${prcnt::-2}"."${prcnt: -2}
 
 #------------------------------------ END ----------------------------------------
