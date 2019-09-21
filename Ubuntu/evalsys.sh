@@ -175,8 +175,8 @@ do
 done < <(grep -vE '^(\s*$|#)' $shdir"/"$1)
 
 printf "%s\n" "-------------------------------------------------------"
-prcnt=$((10000*$pts/$total))
+grade=`bc <<< "scale=2; 100*$pts/$total"`
 
-printf "Uzyskałeś: %d na %d punktów [%s%%]\n" $pts $total ${prcnt::-2}"."${prcnt: -2}
+printf "Uzyskałeś: %d na %d punktów czyli %s%%\n" $pts $total $grade
 
 #------------------------------------ END ----------------------------------------
