@@ -176,7 +176,7 @@ do
 done < <(grep -vE '^(\s*$|#)' $1)
 
 printf "%s\n" "-------------------------------------------------------"
-grade=`bc <<< "scale=2; 100*$pts/$total"`
-printf "Uzyskałeś: %d na %d punktów czyli %s%%\n" $pts $total $grade
+#grade=`bc <<< "scale=2; 100*$pts/$total"`
+printf "Uzyskałeś: %d na %d punktów\n" $pts $total
 
 #------------------------------------ END ----------------------------------------
