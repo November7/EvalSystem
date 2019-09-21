@@ -1,75 +1,39 @@
-#!/bin/bash
-
-
-###############################
-# const
-
-RED='\033[0;31m'
-GRN='\033[0;32m'
-NC='\033[0m' # No Color
-###############################
-# dane
-
-suma=0
-max=0
-tab1=(
-"2.a Odblokowane konto root" "getent shadow root | cut -d':' -f 2 | grep '^[*!]' -v -c"
-"2.b Utworzenie grupy grupa1" "getent group grupa1 | wc -l"
-"  - Sprawdzanie identyfikatora grupy" "getent group grupa1 | cut -d':' -f 3 | grep 20001 -c"
-"  - Utworzenie grupy grupa2" "getent group grupa2 | wc -l"
-"  - Sprawdzanie identyfikatora grupy" "getent group grupa2 | cut -d':' -f 3 | grep 20002 -c"
-"2.c Utworzenie konta adam" "getent passwd adam | wc -l"
-"  - Sprawdzanie grupy grupa1" "getent group grupa1 | grep adam -c"
-"  - Sprawdzanie grupy grupa2" "getent group grupa2 | grep adam -c"
-"  - Katalog domowy" "getent passwd adam | cut -d':' -f6 | grep '/home/users_zsme/adam' -c"
-"  - Identyfikator" "getent passwd adam | cut -d':' -f3 | grep '10000' -c"
-"  - Powloka systemowa" "getent passwd adam | cut -d':' -f7 | grep '/bin/bash' -c"
-"  - Utworzony katalog domowy" "ls /home/users_zsme 2> /dev/null | grep adam -c"
-"  - Prawa do katalogu domowego" "stat -c '%A' /home/users_zsme/adam 2> /dev/null | grep 'drwxrwx---' -c"
-"  - Wlasciciel katalogu domowego" "stat -c '%U%G' /home/users_zsme/adam 2> /dev/null | grep 'adamadam' -c"
-"2.d Utworzenie konta jan" "getent passwd jan | wc -l"
-"  - Sprawdzanie grupy grupa1" "getent group grupa1 | grep jan -c"
-"  - Katalog domowy" "getent passwd jan | cut -d':' -f6 | grep '/home/users_2017/jan' -c"
-"  - Identyfikator" "getent passwd jan | cut -d':' -f3 | grep '20000' -c"
-"  - Powloka systemowa" "getent passwd jan | cut -d':' -f7 | grep '/bin/sh' -c"
-"  - Utworzony katalog domowy" "ls /home/users_zsme 2> /dev/null | grep jan -c"
-"  - Prawa do katalogu domowego" "stat -c '%A' /home/users_zsme/jan 2> /dev/null | grep 'drwxrwx---' -c"
-"  - Wlasciciel katalogu domowego" "stat -c '%U%G' /home/users_zsme/jan 2> /dev/null | grep 'janjan' -c"
-"2.e Katalog users_zsme" "ls /home 2> /dev/null | grep users_zsme -c"
-"  - Prawa do katalogu users_zsme" "stat -c '%A' /home/users_zsme 2> /dev/null | grep 'drwxr-xr-x' -c"
-"  - Wlasciciel katalogu users_zsme" "stat -c '%U%G' /home/users_zsme 2> /dev/null | grep 'rootroot' -c"
-"2.f Dodatkowe katalogi [adam/dokumenty]" "ls /home/users_zsme/adam 2> /dev/null | grep dokumenty -c"
-"  - Prawa do katalogu" "stat -c '%U%G%A' /home/users_zsme/adam/dokumenty 2> /dev/null | grep 'adamadamdrwxrwx---' -c"
-"  - Dodatkowe katalogi [adam/public_html]" "ls /home/users_zsme/adam 2> /dev/null | grep dokumenty -c"
-"  - Prawa do katalogu" "stat -c '%U%G%A' /home/users_zsme/adam/public_html 2> /dev/null | grep 'adamapachedrwxrwx---' -c"
-"  - Dodatkowe katalogi [jan/dokumenty]" "ls /home/users_zsme/jan 2> /dev/null | grep dokumenty -c"
-"  - Prawa do katalogu" "stat -c '%U%G%A' /home/users_zsme/jan/dokumenty 2> /dev/null | grep 'janjandrwxrwx---' -c"
-"  - Dodatkowe katalogi [jan/public_html]" "ls /home/users_zsme/jan 2> /dev/null | grep dokumenty -c"
-"  - Prawa do katalogu" "stat -c '%U%G%A' /home/users_zsme/jan/public_html 2> /dev/null | grep 'janapachedrwxrwx---' -c"
-"2.g Plik index.php" "ls /home/users_zsme/adam/public_html 2> /dev/null | grep index.php -c"
-"  - Plik index.php" "ls /home/users_zsme/jan/public_html 2> /dev/null | grep index.php -c"
-"2.h Konto romek" "getent passwd romek | grep romek -c | awk '{SUM = 1 - \$1} END {print SUM}'"
-"  - Katalog domowy konta romek" "ls /stare | grep 'romek' -c | awk '{SUM = 1 - \$1} END {print SUM}'"
-)
-
-
-for ((i = 0; i < ${#tab1[@]}; i++))
-do
-        printf "%-60s" "${tab1[$i]}:"
-        i=$(($i+1))
-
-#       echo `eval "${tab1[$i]}"`
-        pkt=`eval "${tab1[$i]}"`
-        suma=$(($suma+$pkt))
-
-        if [ $pkt -eq 1 ]; then printf "${GRN}[OK]\n${NC}"
-        else printf "${RED}[FAIL]\n${NC}"
-        fi
-        max=$(($max+1))
-done
-
-
-
-printf "%s\n" "----------------------------------------------------"
-wynik=`bc <<< "scale=2; 100*$suma/$max"`
-printf "Uzyskano: %d na %d punktow czyli %s%%\n" $suma $max $wynik
+"Zaliczenie: Users and groups"
+""
+"2.a Odblokowane konto root" "getent shadow root | cut -d':' -f 2 | grep '^[*!]' -v -c" 2
+"2.b Utworzenie grupy grupa1" "getent group grupa1 | wc -l" 3
+"  - Sprawdzanie identyfikatora grupy" "getent group grupa1 | cut -d':' -f 3 | grep 20001 -c" 3
+"  - Utworzenie grupy grupa2" "getent group grupa2 | wc -l" 2
+"  - Sprawdzanie identyfikatora grupy" "getent group grupa2 | cut -d':' -f 3 | grep 20002 -c" 2
+"2.c Utworzenie konta adam" "getent passwd adam | wc -l" 3
+"  - Sprawdzanie grupy grupa1" "getent group grupa1 | grep adam -c" 3
+"  - Sprawdzanie grupy grupa2" "getent group grupa2 | grep adam -c" 2
+"  - Katalog domowy" "getent passwd adam | cut -d':' -f6 | grep '/home/users_zsme/adam' -c" 3
+"  - Identyfikator" "getent passwd adam | cut -d':' -f3 | grep '10000' -c" 3
+"  - Powloka systemowa" "getent passwd adam | cut -d':' -f7 | grep '/bin/bash' -c" 2
+"  - Utworzony katalog domowy" "ls /home/users_zsme 2> /dev/null | grep adam -c" 3
+"  - Prawa do katalogu domowego" "stat -c '%A' /home/users_zsme/adam 2> /dev/null | grep 'drwxrwx---' -c" 3
+"  - Wlasciciel katalogu domowego" "stat -c '%U%G' /home/users_zsme/adam 2> /dev/null | grep 'adamadam' -c" 3
+"2.d Utworzenie konta jan" "getent passwd jan | wc -l" 3
+"  - Sprawdzanie grupy grupa1" "getent group grupa1 | grep jan -c" 3
+"  - Katalog domowy" "getent passwd jan | cut -d':' -f6 | grep '/home/users_2017/jan' -c" 3
+"  - Identyfikator" "getent passwd jan | cut -d':' -f3 | grep '20000' -c" 3
+"  - Powloka systemowa" "getent passwd jan | cut -d':' -f7 | grep '/bin/sh' -c" 3
+"  - Utworzony katalog domowy" "ls /home/users_zsme 2> /dev/null | grep jan -c" 3
+"  - Prawa do katalogu domowego" "stat -c '%A' /home/users_zsme/jan 2> /dev/null | grep 'drwxrwx---' -c" 3
+"  - Wlasciciel katalogu domowego" "stat -c '%U%G' /home/users_zsme/jan 2> /dev/null | grep 'janjan' -c" 3
+"2.e Katalog users_zsme" "ls /home 2> /dev/null | grep users_zsme -c" 3
+"  - Prawa do katalogu users_zsme" "stat -c '%A' /home/users_zsme 2> /dev/null | grep 'drwxr-xr-x' -c" 3
+"  - Wlasciciel katalogu users_zsme" "stat -c '%U%G' /home/users_zsme 2> /dev/null | grep 'rootroot' -c" 3
+"2.f Dodatkowe katalogi [adam/dokumenty]" "ls /home/users_zsme/adam 2> /dev/null | grep dokumenty -c" 2
+"  - Prawa do katalogu" "stat -c '%U%G%A' /home/users_zsme/adam/dokumenty 2> /dev/null | grep 'adamadamdrwxrwx---' -c" 3
+"  - Dodatkowe katalogi [adam/public_html]" "ls /home/users_zsme/adam 2> /dev/null | grep dokumenty -c" 2
+"  - Prawa do katalogu" "stat -c '%U%G%A' /home/users_zsme/adam/public_html 2> /dev/null | grep 'adamapachedrwxrwx---' -c" 2
+"  - Dodatkowe katalogi [jan/dokumenty]" "ls /home/users_zsme/jan 2> /dev/null | grep dokumenty -c" 2
+"  - Prawa do katalogu" "stat -c '%U%G%A' /home/users_zsme/jan/dokumenty 2> /dev/null | grep 'janjandrwxrwx---' -c" 3
+"  - Dodatkowe katalogi [jan/public_html]" "ls /home/users_zsme/jan 2> /dev/null | grep dokumenty -c" 2
+"  - Prawa do katalogu" "stat -c '%U%G%A' /home/users_zsme/jan/public_html 2> /dev/null | grep 'janapachedrwxrwx---' -c" 2
+"2.g Plik index.php" "ls /home/users_zsme/adam/public_html 2> /dev/null | grep index.php -c" 3
+"  - Plik index.php" "ls /home/users_zsme/jan/public_html 2> /dev/null | grep index.php -c" 3
+"2.h Konto romek" "getent passwd romek | grep romek -c | awk '{SUM = 1 - \$1} END {print SUM}'" 3
+"  - Katalog domowy konta romek" "ls /stare | grep 'romek' -c | awk '{SUM = 1 - \$1} END {print SUM}'" 3
