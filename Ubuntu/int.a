@@ -1,8 +1,17 @@
 "Zaliczenie: Interfejsy sieciowe"
 ""
 "1. Konfiguracja interfejsow sieciowych"
-" - Interfejs enp0s3 10.38.100.$2" "checkInt -i v -a \"10.38.100.$2\" -m \"255.0.0.0\"" 2
+" - Interfejs enp0s3 10.38.100.$2" "checkInt -i enp0s3 -a \"10.38.100.$2\" -m \"255.0.0.0\"" 2
 " - Brama domyslna" "checkInt -i enp0s3 -g \"10.0.0.1\"" 2
 " - Interfejs enp0s8 192.168.0.1" "checkInt -i enp0s8 -a \"192.168.0.1\" -m \"255.255.254.0\"" 2
 " - Interfejs enp0s9 172.16.0.1" "checkInt -i enp0s8 -a \"172.16.0.1\" -m \"255.255.254.0\"" 2
 " - Adres serwera DNS" "cat /etc/resolv.conf | grep \"nameserver 8.8.8.8\" -c" 1
+""
+" - Interfejs enp0s3:second 10.38.200.$2" "checkInt -i enp0s3:second -a \"10.38.200.$2\" -m \"255.0.0.0\"" 2
+""
+""
+" Interfejs enp0s3:tymczasowy" "ifconfig enp0s3:tymczasowy 2> /dev/null | grep 'inet addr' -c" 1 
+"  - Parsowanie pliku interfaces" "cat /etc/network/interfaces | grep 'iface enp0s3 inet static' -c" 1
+"  - Parsowanie pliku interfaces" "cat /etc/network/interfaces | grep 'iface enp0s8 inet static' -c" 1
+"  - Parsowanie pliku interfaces" "cat /etc/network/interfaces | grep 'iface enp0s8:second inet dhcp' -c" 1
+"  - Parsowanie pliku interfaces" "cat /etc/network/interfaces | grep 'iface enp0s9 inet static' -c" 1
