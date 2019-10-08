@@ -1,17 +1,22 @@
 "Zaliczenie: Interfejsy sieciowe"
 ""
-"1. Konfiguracja interfejsow sieciowych"
-" - Interfejs enp0s3 10.38.100.$2" "checkInt -i enp0s3 -a \"10.38.100.$2\" -m \"255.0.0.0\"" 2
-" - Brama domyslna" "checkInt -i enp0s3 -g \"10.0.0.1\"" 2
-" - Interfejs enp0s8 192.168.0.1" "checkInt -i enp0s8 -a \"192.168.0.1\" -m \"255.255.254.0\"" 2
-" - Interfejs enp0s9 172.16.0.1" "checkInt -i enp0s8 -a \"172.16.0.1\" -m \"255.255.254.0\"" 2
-" - Adres serwera DNS" "cat /etc/resolv.conf | grep \"nameserver 8.8.8.8\" -c" 1
+"2.1. Konfiguracja interfejsow sieciowych"
+" a) Interfejs enp0s3 10.38.1.$2" "checkInt -i enp0s3 -a \"10.38.1.$2\" -m \"255.0.0.0\"" 2
+" b) Brama domyslna" "checkInt -i enp0s3 -g \"10.0.0.1\"" 2
+" c) Interfejs enp0s8 192.168.0.1/28" "checkInt -i enp0s8 -a \"192.168.0.1\" -m \"255.255.255.240\"" 2
+" d) Interfejs enp0s9 172.16.0.1/23" "checkInt -i enp0s8 -a \"172.16.0.1\" -m \"255.255.254.0\"" 2
+" e) Adres serwera DNS" "cat /etc/resolv.conf | grep \"nameserver 8.8.8.8\" -c" 2
 ""
-" - Interfejs enp0s3:second 10.38.200.$2" "checkInt -i enp0s3:second -a \"10.38.200.$2\" -m \"255.0.0.0\"" 2
+"2.2. Konfiguracja subinterfejsow sieciowych"
+" a) Interfejs enp0s3:fst 10.38.2.$2" "checkInt -i enp0s3:fst -a \"10.38.2.$2\" -m \"255.0.0.0\"" 2
+" b) Interfejs enp0s3:sec" "checkInt -i enp0s3:sec" 2
+" c) Interfejs enp0s3:tmp 10.38.3.$2" "checkInt -i enp0s3:tmp -a \"10.38.3.$2\" -m \"255.0.0.0\"" 2
 ""
-""
-" Interfejs enp0s3:tymczasowy" "ifconfig enp0s3:tymczasowy 2> /dev/null | grep 'inet addr' -c" 1 
-"  - Parsowanie pliku interfaces" "cat /etc/network/interfaces | grep 'iface enp0s3 inet static' -c" 1
-"  - Parsowanie pliku interfaces" "cat /etc/network/interfaces | grep 'iface enp0s8 inet static' -c" 1
-"  - Parsowanie pliku interfaces" "cat /etc/network/interfaces | grep 'iface enp0s8:second inet dhcp' -c" 1
-"  - Parsowanie pliku interfaces" "cat /etc/network/interfaces | grep 'iface enp0s9 inet static' -c" 1
+"2.3. Parsowanie pliku interfaces"
+"  - Interface enp0s3" "cat /etc/network/interfaces | grep 'iface enp0s3 inet static' -c" 1
+"  - Subinterface fst" "cat /etc/network/interfaces | grep 'iface enp0s3:fst inet static' -c" 1
+"  - Subinterface sec" "cat /etc/network/interfaces | grep 'iface enp0s3:sec inet dhcp' -c" 1
+"  - Interface enp0s8" "cat /etc/network/interfaces | grep 'iface enp0s8 inet static' -c" 1
+"  - Interface enp0s9" "cat /etc/network/interfaces | grep 'iface enp0s9 inet static' -c" 1
+"  - Adres DNS" "cat /etc/network/interfaces | grep 'dns-nameservers 8.8.8.8' -c" 1
+"  - Brama domyślna" "cat /etc/network/interfaces | grep 'gateway 10.0.0.1' -c" 1

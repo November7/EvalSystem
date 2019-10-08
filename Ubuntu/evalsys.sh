@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # author: Marcin Kowalski
-# version: 1.0
-# build: 1610.18
+# version: 1.0.1
+# build: 0810.19
 
 #--------------------------------------------------------------------------------
 #
@@ -105,11 +105,12 @@ function checkInt
 		esac
 		shift
 	done
+	int=$(echo $interface | cut -d':' -f1)
 	line=$(ifconfig $interface)
 	echo $(($(echo $line | wc -l) &&
 	$(echo $line | grep "inet addr:$address" -c) &&
 	$(echo $line | grep "Mask:$netmask" -c) &&
-	$(route -n | grep "0.0.0.0" | grep "$gateway" | grep "$interface" -c)))
+	$(route -n | grep "0.0.0.0" | grep "$gateway" | grep "$int" -c)))
 
 }
 
