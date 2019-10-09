@@ -6,7 +6,7 @@
 
 #--------------------------------------------------------------------------------
 # changelog:
-# v1.0.2 build 0910.19 - fix parseFile, add grep -w (whole words)
+# v1.0.2 build 0910.19 - fix parseFile, add grep -w (whole words), add subsubvalue
 # v1.0.1 build 0810.19 - fix checkInt, add subinterfaces support
 #
 #--------------------------------------------------------------------------------
@@ -60,11 +60,11 @@ function checkUser
 }
 
 #---------------------------------- parseFile ------------------------------------
-# usage: parseFile <file> <param> <value> <subvalue>
+# usage: parseFile <file> <param> <value> <subvalue> <subsub>
 
 function parseFile
 {
-	if [ $(cat "$1" | grep -vE '^(\s*$|#)' | grep -w "$2" | grep -w "$3" | grep -w "$4" -c) -gt 0 ]; then
+	if [ $(cat "$1" | grep -vE '^(\s*$|#)' | grep -w "$2" | grep -w "$3" | grep -w "$4" | grep -w "$5" -c) -gt 0 ]; then
 		echo 1
 	else
 		echo 0
