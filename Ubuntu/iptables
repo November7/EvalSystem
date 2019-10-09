@@ -1,0 +1,9 @@
+"Zaliczenie: IPTABLES"
+""
+" - Skrypt firewall.sh" "ls -l /root | grep 'firewall.sh' -c" 1
+" - Prawa pliku firewall.sh" "stat -c \"%A\" /root/firewall.sh | grep 'x' -c" 1
+" - Domyslna polityka INPUT" "iptables -S | grep '\-P INPUT' | grep 'DROP' -c" 1
+" - Domyslna polityka OUTPUT" "iptables -S | grep '\-P OUTPUT' | grep 'ACCEPT' -c" 1
+" - Domyslna polityka FORWARD" "iptables -S | grep '\-P FORWARD' | grep 'ACCEPT' -c" 1
+" - NAT (Maskarada)" "iptables -t nat -S | grep 'POSTROUTING' | grep '\-o.*enp0s3' | grep '\-j.*MASQUERADE' -c" 3
+" - Ruch TCP" "iptables -S | grep 'OUTPUT' | grep '\-p.*tcp' | grep '\-dport.*23' | grep '\-j.*DROP' -c" 3
