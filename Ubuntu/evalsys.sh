@@ -64,7 +64,7 @@ function checkUser
 
 function parseFile
 {
-	if [ $(cat "$1" | grep -vE '^(\s*$|#)' | grep -w "$2" | grep -w "$3" | grep -w "$4" | grep -w "$5" -c) -gt 0 ]; then
+	if [ $(cat "$1" | grep -vE '^(\s*$|#)' | grep -w "$2" | grep -w "$3" | grep "$4" | grep "$5" -c) -gt 0 ]; then
 		echo 1
 	else
 		echo 0
