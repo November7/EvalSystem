@@ -2,6 +2,7 @@
 ""
 " - Skrypt firewall.sh" "ls -l /root | grep 'firewall.sh' -c" 1
 " - Prawa pliku firewall.sh" "stat -c \"%A\" /root/firewall.sh | grep 'x' -c" 1
+" - Wlaczenie forwardowania pakietow" "cat /proc/sys/net/ipv4/ip_forward" 1
 " - Domyslna polityka INPUT" "iptables -S | grep '\-P INPUT' | grep 'DROP' -c" 1
 " - Domyslna polityka OUTPUT" "iptables -S | grep '\-P OUTPUT' | grep 'ACCEPT' -c" 1
 " - Domyslna polityka FORWARD" "iptables -S | grep '\-P FORWARD' | grep 'ACCEPT' -c" 1
