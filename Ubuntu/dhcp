@@ -6,32 +6,21 @@
 " - Interfejs eth1 192.168.0.1" "checkInt -i eth1 -a \"192.168.0.1\" -m \"255.255.254.0\"" 2
 " - Adres serwera DNS" "cat /etc/resolv.conf | grep \"nameserver 8.8.8.8\" -c" 1
 ""
-"2. Instalacja oprogramowania"
-" - Skaner portow" "isInstalled nmap" 2
-" - Server DHCP" "isInstalled isc-dhcp-server" 3
-" - Server SSH" "isInstalled ssh" 3
-""
-"3. Konfiguracja SSH"
+"2. Konfiguracja SSH"
 " - Plik konfiguracyjny: port 22" "parseFile /etc/ssh/sshd_config Port 22" 1
 " - Plik konfiguracyjny: port 22222" "parseFile /etc/ssh/sshd_config Port 22222" 2
 " - Logowanie root" "parseFile /etc/ssh/sshd_config PermitRootLogin yes" 3
 " - Uruchomiona usluga ssh" "nmap -p 22222 127.0.0.1 | grep \"22222/tcp open\" -c" 2
 ""
-"4. Skanowanie portow"
+"3. Skanowanie portow"
 " - Plik z raportem skanowania" "cat \"/root/skanowanie\" | grep \"Starting Nmap\" -c" 3
 ""
-"5. Konfiguracja serwera DHCP"
-" - Przydzial (SalaB)" "checkDHCPleases \"192.168.0.1\" \"00:12:34:56:78:92\"" 2
-" - Przydzial (Others)" "checkDHCPleases \"192.168.1.\" \"00:12:34:56:78:93\"" 2
+"4. Konfiguracja serwera DHCP"
 " - Restart serwera DHCP" "service isc-dhcp-server restart | grep \"isc-dhcp-server start/running\" -c" 5
 " - Serwer DNS: 8.8.4.4" "parseFile \"/etc/dhcp/dhcpd.conf\" \"option domain-name-servers\" \"8.8.4.4\"" 2
 " - Brama domyslna" "parseFile \"/etc/dhcp/dhcpd.conf\" \"option routers\" \"192.168.0.1\"" 2
 " - Domyslny czas dzierzawy" "parseFile \"/etc/dhcp/dhcpd.conf\" \"default-lease-time\" \"2700\"" 2
 " - Maksymalny czas dzierzawy" "parseFile \"/etc/dhcp/dhcpd.conf\" \"max-lease-time\" \"2700\"" 2
-" - Klasa SalaA" "parseFile \"/etc/dhcp/dhcpd.conf\" \"class\" \"SalaA\"" 3
-" - Klasa SalaB" "parseFile \"/etc/dhcp/dhcpd.conf\" \"class\" \"SalaB\"" 3
-" - PCA01 w SalaA" "parseFile \"/etc/dhcp/dhcpd.conf\" \"subclass\" \"SalaA\" \"1:00:12:34:56:78:91\"" 3
-" - PCB01 w SalaB" "parseFile \"/etc/dhcp/dhcpd.conf\" \"subclass\" \"SalaB\" \"1:00:12:34:56:78:92\"" 3
 " - Host PCA01" "checkDHCPHost PCA01 \"00:12:34:56:78:91\"" 3
 " - Host PCA01 adres IP" "checkDHCPHost PCA01 \"00:12:34:56:78:91\" \"fixed-address\" \"192.168.0.10\"" 2
 " - Host PCA01 czas dzierzawy" "checkDHCPHost PCA01 \"00:12:34:56:78:91\" \"max-lease-time\" \"7200\"" 2
@@ -43,6 +32,5 @@
 " - Zakres 192.168.0.200 - 192.168.0.255" "parseFile \"/etc/dhcp/dhcpd.conf\" \"range\" \"192.168.0.200\" \"192.168.0.255\"" 4
 " - Zakres 192.168.0.100 - 192.168.0.199" "parseFile \"/etc/dhcp/dhcpd.conf\" \"range\" \"192.168.0.100\" \"192.168.0.199\"" 4
 " - Zakres 192.168.1.0 - 192.168.1.200" "parseFile \"/etc/dhcp/dhcpd.conf\" \"range\" \"192.168.1.0\" \"192.168.1.200\"" 4
-" - Zakres dla SalaA" "parseFile \"/etc/dhcp/dhcpd.conf\" \"allow members of\" \"SalaA\"" 3
-" - Zakres dla SalaB" "parseFile \"/etc/dhcp/dhcpd.conf\" \"allow members of\" \"SalaB\"" 3
+" - Zakres dla znanych" "parseFile \"/etc/dhcp/dhcpd.conf\" \"deny\" \"unknown-clients\"" 3
 " - Zakres dla pozostalych" "parseFile \"/etc/dhcp/dhcpd.conf\" \"allow\" \"unknown-clients\"" 3
