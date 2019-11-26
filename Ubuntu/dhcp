@@ -1,9 +1,9 @@
 "Zaliczenie: DHCP i SSH"
 ""
 "1. Konfiguracja interfejsow sieciowych"
-" - Interfejs eth0 10.38.100.$2" "checkInt -i eth0 -a \"10.38.100.$2\" -m \"255.0.0.0\"" 2
-" - Brama domyslna" "checkInt -i eth0 -g \"10.0.0.1\"" 2
-" - Interfejs eth1 192.168.0.1" "checkInt -i eth1 -a \"192.168.0.1\" -m \"255.255.254.0\"" 2
+" - Interfejs enp0s3 10.38.100.$2" "checkInt -i enp0s3 -a \"10.38.100.$2\" -m \"255.0.0.0\"" 2
+" - Brama domyslna" "checkInt -i enp0s3 -g \"10.0.0.1\"" 2
+" - Interfejs enp0s8 192.168.0.1" "checkInt -i enp0s8 -a \"192.168.0.1\" -m \"255.255.254.0\"" 2
 " - Adres serwera DNS" "cat /etc/resolv.conf | grep \"nameserver 8.8.8.8\" -c" 1
 ""
 "2. Konfiguracja SSH"
