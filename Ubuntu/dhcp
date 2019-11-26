@@ -16,8 +16,9 @@
 " - Plik z raportem skanowania" "cat \"/root/skanowanie\" | grep \"Starting Nmap\" -c" 3
 ""
 "4. Konfiguracja serwera DHCP"
-" - Nasłuch na int wew." "parseFile \"/etc/default/isc-dhcp-server.conf\" \"INTERFACES\" \"enp0s8\"" 2
-" - Restart serwera DHCP" "service isc-dhcp-server restart | grep \"isc-dhcp-server start/running\" -c" 5
+" - DHCP na int wew." "parseFile \"/etc/default/isc-dhcp-server\" \"INTERFACES\" \"enp0s8\"" 2
+" - Restart serwera DHCP" "service isc-dhcp-server restart" -c"
+" - Restart serwera DHCP" "service isc-dhcp-server status | grep \"Active: active (running)\" -c" 5
 " - Serwer DNS: 8.8.4.4" "parseFile \"/etc/dhcp/dhcpd.conf\" \"option domain-name-servers\" \"8.8.4.4\"" 2
 " - Brama domyslna" "parseFile \"/etc/dhcp/dhcpd.conf\" \"option routers\" \"192.168.0.1\"" 2
 " - Domyslny czas dzierzawy" "parseFile \"/etc/dhcp/dhcpd.conf\" \"default-lease-time\" \"2700\"" 2
@@ -31,7 +32,6 @@
 " - Maska pdosieci 192.168.0.0" "parseFile \"/etc/dhcp/dhcpd.conf\" \"netmask\" \"255.255.254.0\"" 4
 " - Zakres 192.168.0.20 - 192.168.0.99" "parseFile \"/etc/dhcp/dhcpd.conf\" \"range\" \"192.168.0.20\" \"192.168.0.99\"" 4
 " - Zakres 192.168.0.200 - 192.168.0.255" "parseFile \"/etc/dhcp/dhcpd.conf\" \"range\" \"192.168.0.200\" \"192.168.0.255\"" 4
-" - Zakres 192.168.0.100 - 192.168.0.199" "parseFile \"/etc/dhcp/dhcpd.conf\" \"range\" \"192.168.0.100\" \"192.168.0.199\"" 4
 " - Zakres 192.168.1.0 - 192.168.1.200" "parseFile \"/etc/dhcp/dhcpd.conf\" \"range\" \"192.168.1.0\" \"192.168.1.200\"" 4
 " - Zakres dla znanych" "parseFile \"/etc/dhcp/dhcpd.conf\" \"deny\" \"unknown-clients\"" 3
 " - Zakres dla pozostalych" "parseFile \"/etc/dhcp/dhcpd.conf\" \"allow\" \"unknown-clients\"" 3
