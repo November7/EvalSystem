@@ -17,7 +17,7 @@
 ""
 "4. Konfiguracja serwera DHCP"
 " - DHCP na int wew." "parseFile \"/etc/default/isc-dhcp-server\" \"INTERFACES\" \"enp0s8\"" 2
-" - Restart serwera DHCP" "service isc-dhcp-server restart" -c" 0
+" - Restart serwera DHCP" "service isc-dhcp-server restart" 0
 " - Restart serwera DHCP" "service isc-dhcp-server status | grep \"Active: active (running)\" -c" 5
 " - Serwer DNS: 8.8.4.4" "parseFile \"/etc/dhcp/dhcpd.conf\" \"option domain-name-servers\" \"8.8.4.4\"" 2
 " - Brama domyslna" "parseFile \"/etc/dhcp/dhcpd.conf\" \"option routers\" \"192.168.0.1\"" 2
